@@ -1,5 +1,5 @@
 # define minimum cmake version
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.11)
 
 project( Guayadeque )
 
@@ -38,21 +38,17 @@ PKG_CHECK_MODULES( GSTREAMER_TAG REQUIRED gstreamer-tag-1.0 )
 PKG_CHECK_MODULES( SQLITE3 REQUIRED sqlite3 )
 PKG_CHECK_MODULES( LIBCURL REQUIRED libcurl )
 
-PKG_CHECK_MODULES( LIBTAG taglib>=1.6.4)
-IF( NOT LIBTAG_FOUND )
-        PKG_CHECK_MODULES( LIBTAG taglib>=1.6.1)
-        IF( NOT LIBTAG_FOUND )
-                PKG_CHECK_MODULES( LIBTAG taglib>=1.6 )
-                IF( NOT LIBTAG_FOUND )
-                        MESSAGE( FATAL_ERROR "taglib 1.6 not found!" )
-                ENDIF( NOT LIBTAG_FOUND )
-        ELSE( NOT LIBTAG_FOUND )
+PKG_CHECK_MODULES(LIBTAG taglib>=2.0)
+IF(NOT LIBTAG_FOUND)
+        MESSAGE(FATAL_ERROR "taglib 2.0 not found!")
+ELSE(NOT LIBTAG_FOUND)
+        IF(LIBTAG_VERSION LESS 3.0)
                 ADD_DEFINITIONS(-DTAGLIB_WITH_MP4_COVERS=1)
-        ENDIF( NOT LIBTAG_FOUND )
-ELSE( NOT LIBTAG_FOUND )
-        ADD_DEFINITIONS(-DTAGLIB_WITH_MP4_COVERS=1)
-        ADD_DEFINITIONS(-DTAGLIB_WITH_APE_SUPPORT=1)
-ENDIF( NOT LIBTAG_FOUND )
+                ADD_DEFINITIONS(-DTAGLIB_WITH_APE_SUPPORT=1)
+        ELSE(LIBTAG_VERSION LESS 3.0)
+                MESSAGE(FATAL_ERROR "taglib version must be less than 3.0!")
+        ENDIF(LIBTAG_VERSION LESS 3.0)
+ENDIF(NOT LIBTAG_FOUND)
 
 PKG_CHECK_MODULES( LIBDBUS REQUIRED dbus-1 )
 
